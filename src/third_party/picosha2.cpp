@@ -13,12 +13,3 @@ string generarHash(string psw) {
 
     return hash_hex_str;
 }
-
-/*int main() {
-hash256 
-    string contraseña = "aaa"; //x Contraseña a generar
-    string hash = generarHash(contraseña); // Llamado a la función que me genera el hash de la contraseña
-    cout << "Hash of \"" << contraseña << "\": " << hash << endl;
-}
-
-*/
