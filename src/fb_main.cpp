@@ -22,6 +22,9 @@ para cada caracter en alfabeto:
 #include <string>
 #include <vector>
 
+#include <chrono> // Biblioteca para medir el tiempo de ejecución
+#include <fstream> // Biblioteca para escribir en archivos
+
 using namespace std;
 
 // -> Modelamiento del problema <-
@@ -154,24 +157,105 @@ void casosPrueba() {
     return;
 }
 
+void pruebasTamañosEntrada() {
+
+    // Implementación de pruebas de tamaños de entrada para métricas de tiempo y espacio
+
+    vector<int> longitudesPruebaA1 = {3, 4, 5, 6}; // Longitudes de prueba para el alfabeto 1
+    vector<int> longitudesPruebaA2 = {3, 4, 5}; // Longitudes de prueba para el alfabeto 2
+
+    // Definimos un arreglo de contraseñas ya establecidas para hacer un ánalisis uniforme 
+    // de los tiempos de ejecución y el espacio utilizado para cada tamaño de entrada. Evitando comparar un 
+    // posible mejor caso con uno peor. 
+    // Se usa la m pues está alrededor de la mitad del alfabeto
+    vector<string> contraseñasObjetivo = {"mmm", "mmmm", "mmmmm", "mmmmmm"};
+
+    ofstream archivoSalida("/Users/saimon_4315/Documents/6to semestre/ADA/Entrega-1-ADA/results/resultados_FB.csv"); // Archivo para almacenar los resultados de las pruebas
+
+    if (!archivoSalida.is_open()) {
+        cerr << "No se pudo crear el archivo de métricas." << endl;
+        return;
+    }
+
+    archivoSalida << "<------ Resultados de las pruebas de tamaños de entrada ------>" << endl;
+    archivoSalida << " " << endl;
+
+    archivoSalida << "------------------------------------------------------------------------------------------------" << endl;
+    archivoSalida << "|  Alfabeto   |   Longitud  |   Tiempo de ejecución (µs) | candidato evaluado | resultado |" << endl;
+    archivoSalida << "------------------------------------------------------------------------------------------------" << endl;
+
+
+    for(int i = 0; i < longitudesPruebaA1.size(); i++) {
+        
+        encontrado = false; // Reiniciamos la variable encontrado para la siguiente búsqueda
+        
+        string hash = generarHash(contraseñasObjetivo[i]); // Generación del hash de la contraseña objetivo
+
+        auto inicio = chrono::high_resolution_clock::now(); // Inicio de la medición de tiempo
+        string candidato = generarContraseña("", longitudesPruebaA1[i], alfabetoA1, hash); // Búsqueda de la contraseña a partir del hash
+        auto fin = chrono::high_resolution_clock::now(); // Fin de la medición de tiempo
+
+        chrono::duration<double, micro> elapsed = fin - inicio; // Cálculo del tiempo transcurrido
+
+        string resultado = "";
+        if(candidato == "") {
+            resultado = "No encontrado";
+        } else {
+            resultado = "Encontrado";
+        }
+
+        archivoSalida << "|  " << alfabetoA1 << "   |   " << longitudesPruebaA1[i] << "  |   " 
+                      << elapsed.count() << " | " << contraseñasObjetivo[i] << " | " << resultado  << "  |   " << endl;
+    }
+
+    archivoSalida << "------------------------------------------------------------------------------------------------" << endl;
+
+    for(int i = 0; i < longitudesPruebaA2.size(); i++) {
+
+        encontrado = false; // Reiniciamos la variable encontrado para la siguiente búsqueda
+
+        string hash = generarHash(contraseñasObjetivo[i]); // Generación del hash de la contraseña objetivo
+
+        auto inicio = chrono::high_resolution_clock::now(); // Inicio de la medición de tiempo
+        string candidato = generarContraseña("", longitudesPruebaA2[i], alfabetoA2, hash); // Búsqueda de la contraseña a partir del hash
+        auto fin = chrono::high_resolution_clock::now(); // Fin de la medición de tiempo
+
+        chrono::duration<double, micro> elapsed = fin - inicio; // Cálculo del tiempo transcurrido
+
+        string resultado = "";
+        if(candidato == "") {
+            resultado = "No encontrado";
+        } else {
+            resultado = "Encontrado";
+        }
+
+        archivoSalida << "|  " << alfabetoA2 << "   |   " << longitudesPruebaA2[i] << "  |   " 
+                      << elapsed.count() << " | " << contraseñasObjetivo[i] << " | " << resultado  << "  |   " << endl;
+    }
+
+    return;
+}
+
 int main() {
 
     while (true) {
         
+        int opcion;    
+
         cout << "" << endl;
         cout << "Ingrese la opción que le gustaría hacer" << endl;
         cout << "1. Revisar casos de prueba" << endl;
         cout << "2. Hacer pruebas de tamaños de entrada para métricas" << endl;
         cout << "3. salir" << endl;
 
-        int opcion;
         cin >> opcion;
 
         if (opcion == 1) {
-            // Llamado a la función de casos de prueba+
+            // Llamado a la función de casos de prueba para verificar cumplimiento de la función
             casosPrueba();
         } else if (opcion == 2) {
-            cout << "Se harán pruebas de tamaños de entrada" << endl;
+            // A través de esta opción se pueden hacer pruebas de tamaños de entrada para métricas de tiempo y espacio
+            pruebasTamañosEntrada();
             cout << "" << endl;
         } else if (opcion == 3) {
             cout << "Saliendo del programa..." << endl;
@@ -182,6 +266,4 @@ int main() {
             cout << "" << endl;
         }
     }
-
-    return 0;
 }
