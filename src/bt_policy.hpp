@@ -1,6 +1,4 @@
 // bt_policy.hpp
-// Estructura de la politica de contraseñas y calculo de la semilla del equipo
-
 
 #ifndef BT_POLICY_HPP
 #define BT_POLICY_HPP
@@ -9,8 +7,17 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <cctype>
 
-// Estructura que representa la politica de contraseñas
+// Clasifica un caracter segun su tipo (minuscula, mayuscula, digito o simbolo).
+char tipoDeCaracter(char c) {
+    if (islower((unsigned char)c)) return 'L';
+    if (isupper((unsigned char)c)) return 'U';
+    if (isdigit((unsigned char)c)) return 'D';
+    return 'S';
+}
+
+// Estructura que representa la politica de contraseñas de la Seccion 9.2
 struct Policy {
     int n;          // longitud fija de la contraseña
     int minLower;   // minimo de minusculas
@@ -19,7 +26,6 @@ struct Policy {
     int minSymbol;  // minimo de simbolos
     bool noRepetidosConsecutivos; // prohibicion de 2 caracteres iguales seguidos
 };
-
 
 std::string quitarTildes(const std::string& texto) {
     std::vector<std::pair<std::string, char>> tildes = {
@@ -63,6 +69,7 @@ std::string normalizarApellido(const std::string& apellido) {
     return res;
 }
 
+// Calcula la semilla del equipo a partir de los apellidos de sus integrantes
 int calcularSemilla(std::vector<std::string> apellidos) {
     for (size_t i = 0; i < apellidos.size(); i++) {
         apellidos[i] = normalizarApellido(apellidos[i]);
@@ -84,7 +91,6 @@ int calcularSemilla(std::vector<std::string> apellidos) {
     return semilla;
 }
 
-// Deriva los parametros de la politica de contraseñas 
 Policy derivarPolitica(int semilla, int n = 8) {
     Policy p;
     p.n = n;
@@ -96,10 +102,11 @@ Policy derivarPolitica(int semilla, int n = 8) {
 
     int sumaMinimos = p.minLower + p.minUpper + p.minDigit + p.minSymbol;
 
+    // Si la suma de los minimos supera la longitud n, se reduce minLower
     if (sumaMinimos > n) {
         int exceso = sumaMinimos - n;
         p.minLower = p.minLower - exceso;
-
+        // si aun asi queda negativo, se deja en 0 
         if (p.minLower < 0) {
             p.minLower = 0;
         }
@@ -109,6 +116,7 @@ Policy derivarPolitica(int semilla, int n = 8) {
 
     return p;
 }
+
 
 bool coincideConReferencia(const Policy& p) {
     int refMinLower = 2;

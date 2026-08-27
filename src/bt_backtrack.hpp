@@ -1,24 +1,16 @@
 // bt_backtrack.hpp
 
-
 #ifndef BT_BACKTRACK_HPP
 #define BT_BACKTRACK_HPP
 
 #include <string>
 #include <vector>
-#include <cctype>
 #include <limits>
 #include <iostream>
 #include "bt_policy.hpp"
 
-
-char tipoDeCaracter(char c) {
-    if (islower((unsigned char)c)) return 'L';
-    if (isupper((unsigned char)c)) return 'U';
-    if (isdigit((unsigned char)c)) return 'D';
-    return 'S';
-}
-
+// Funcion de factibilidad: determina si un prefijo parcial todavia puede
+// extenderse hasta una solucion valida.
 
 bool esFactible(const Policy& p, int posicionActual,
                  int countLower, int countUpper, int countDigit, int countSymbol) {
@@ -53,12 +45,10 @@ void backtrackConPoda(std::string prefijo,
 
     nodosVisitados++;
 
-    // si ya se alcanzo el limite de soluciones pedidas, no seguimos explorando
     if (limiteSoluciones > 0 && (int)soluciones.size() >= limiteSoluciones) {
         return;
     }
 
-    // caso base: el prefijo ya tiene longitud n
     if ((int)prefijo.size() == p.n) {
         if (countLower >= p.minLower && countUpper >= p.minUpper &&
             countDigit >= p.minDigit && countSymbol >= p.minSymbol) {
@@ -67,20 +57,17 @@ void backtrackConPoda(std::string prefijo,
         return;
     }
 
-    // poda: si el prefijo actual ya no puede llevar a una solucion valida,
-    // se abandona esta rama sin generar ninguno de sus descendientes
     if (!esFactible(p, (int)prefijo.size(), countLower, countUpper, countDigit, countSymbol)) {
         return;
     }
 
     for (char c : alfabeto) {
-        // prohibicion de dos caracteres identicos consecutivos
         if (p.noRepetidosConsecutivos && c == ultimoCaracter) {
             continue;
         }
 
         if (nodosVisitados >= maxNodos) {
-            return; 
+            return;
         }
 
         int nuevoLower = countLower;
@@ -98,11 +85,10 @@ void backtrackConPoda(std::string prefijo,
                           c, p, alfabeto, soluciones, nodosVisitados, limiteSoluciones, maxNodos);
 
         if (limiteSoluciones > 0 && (int)soluciones.size() >= limiteSoluciones) {
-            return; 
+            return;
         }
     }
 }
-
 
 std::vector<std::string> resolverBacktracking(const Policy& p, const std::string& alfabeto,
                                                long long& nodosVisitados,
@@ -130,9 +116,8 @@ void backtrackContarConPoda(std::string& prefijo,
 
     nodosVisitados++;
 
-
     if (intervaloProgreso > 0 && nodosVisitados % intervaloProgreso == 0) {
-        std::cout << "  ...progreso: " << nodosVisitados << " nodos visitados, "
+        std::cout << "  ...progreso (con poda): " << nodosVisitados << " nodos visitados, "
                   << totalSoluciones << " soluciones encontradas hasta ahora" << std::endl;
     }
 
@@ -175,7 +160,7 @@ void backtrackContarConPoda(std::string& prefijo,
     }
 }
 
-
+// Funcion de conveniencia para contar soluciones con poda
 long long contarSoluciones(const Policy& p, const std::string& alfabeto,
                             long long& nodosVisitados,
                             long long maxNodos = std::numeric_limits<long long>::max(),
