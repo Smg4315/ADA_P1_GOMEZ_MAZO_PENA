@@ -29,11 +29,18 @@ resolverBacktracking(prefijo, contadores, politica, alfabeto):
 
 using namespace std;
 
+// -> Modelamiento del problema <-
+// Alfabeto base del Modulo BT: minusculas, mayusculas,
+// digitos, y el conjunto de simbolos {!, @, #, $, %}.
+
 const string alfabetoBT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
 
-// Apellidos del equipo, en orden alfabetico 
+// Apellidos del equipo, en orden alfabetico (Seccion 9.1/9.2)
 const vector<string> apellidosEquipo = {"gomez", "mazo", "pena"};
 
+// Funcion para hacer el caso de prueba de la instancia de referencia
+// comun: minLower=2, minUpper=1, minDigit=1, minSymbol=1,
+// sin repetidos consecutivos, n=6, alfabeto base completo.
 void casosPrueba() {
 
     int semilla = calcularSemilla(apellidosEquipo);
@@ -66,14 +73,13 @@ void casosPrueba() {
 }
 
 // Funcion para hacer las pruebas de las 5 variantes de dificultad
-// especificadas en la Seccion 9.2, comparando la version con poda contra
-// la version sin poda.
-void pruebasVariantes() {
+
+void pruebasVariantes(bool usarLimite, long long maxNodos) {
 
     int semilla = calcularSemilla(apellidosEquipo);
     Policy politicaEquipo = derivarPolitica(semilla, 8);
 
-    // Vector de las 5 variantes de dificultad (Seccion 9.2)
+    // Vector de las 5 variantes de dificultad
     vector<pair<string, Policy>> variantes;
 
     Policy v1 = politicaEquipo;
@@ -112,47 +118,68 @@ void pruebasVariantes() {
         return;
     }
 
-    archivoSalida << "variante,n,nodos_con_poda,nodos_sin_poda,soluciones_con_poda,soluciones_sin_poda,tiempo_con_poda_s,tiempo_sin_poda_s" << endl;
+    archivoSalida << "variante,n,nodos_con_poda,nodos_sin_poda,soluciones_con_poda,soluciones_sin_poda,tiempo_con_poda_s,tiempo_sin_poda_s,truncado" << endl;
+
+    cout << "\n----------------------------------------------------------------------------------------------------------------------" << endl;
+    cout << "|  Variante                                        |  n  |  Nodos con poda  |  Nodos sin poda  |  Tiempo con poda (s)  |  Tiempo sin poda (s)  |" << endl;
+    cout << "----------------------------------------------------------------------------------------------------------------------" << endl;
 
     for (const auto& variante : variantes) {
         string nombre = variante.first;
         Policy p = variante.second;
 
-        cout << "\n--- " << nombre << " ---" << endl;
-
         // Version CON PODA (modo conteo, para no agotar memoria)
         long long nodosConPoda = 0;
         auto inicioConPoda = chrono::high_resolution_clock::now();
-        long long solucionesConPoda = contarSoluciones(p, alfabetoBT, nodosConPoda);
+        long long solucionesConPoda = usarLimite
+            ? contarSoluciones(p, alfabetoBT, nodosConPoda, maxNodos)
+            : contarSoluciones(p, alfabetoBT, nodosConPoda);
         auto finConPoda = chrono::high_resolution_clock::now();
         chrono::duration<double> tiempoConPoda = finConPoda - inicioConPoda;
-
-        cout << "Con poda -> nodos: " << nodosConPoda
-             << ", soluciones: " << solucionesConPoda
-             << ", tiempo: " << tiempoConPoda.count() << "s" << endl;
 
         // Version SIN PODA
         long long nodosSinPoda = 0;
         auto inicioSinPoda = chrono::high_resolution_clock::now();
-        vector<string> solucionesSinPoda = resolverSinPoda(p, alfabetoBT, nodosSinPoda);
+        vector<string> solucionesSinPoda = usarLimite
+            ? resolverSinPoda(p, alfabetoBT, nodosSinPoda, maxNodos)
+            : resolverSinPoda(p, alfabetoBT, nodosSinPoda);
         auto finSinPoda = chrono::high_resolution_clock::now();
         chrono::duration<double> tiempoSinPoda = finSinPoda - inicioSinPoda;
 
-        cout << "Sin poda -> nodos: " << nodosSinPoda
-             << ", soluciones: " << solucionesSinPoda.size()
-             << ", tiempo: " << tiempoSinPoda.count() << "s" << endl;
+        bool truncado = usarLimite && (nodosConPoda >= maxNodos || nodosSinPoda >= maxNodos);
+        bool correcto = (solucionesConPoda == (long long)solucionesSinPoda.size());
 
-        if (solucionesConPoda == (long long)solucionesSinPoda.size()) {
-            cout << "Verificacion de correctitud: OK (mismo numero de soluciones)" << endl;
+        // Fila de la tabla en consola
+        cout << "|  " << nombre;
+        for (int i = 0; i < (int)(48 - nombre.size()) && i >= 0; i++) cout << " ";
+        cout << "|  " << p.n << "  |  " << nodosConPoda;
+        for (int i = 0; i < (int)(17 - to_string(nodosConPoda).size()) && i >= 0; i++) cout << " ";
+        cout << "|  " << nodosSinPoda;
+        for (int i = 0; i < (int)(17 - to_string(nodosSinPoda).size()) && i >= 0; i++) cout << " ";
+        cout << "|  " << tiempoConPoda.count();
+        for (int i = 0; i < (int)(21 - to_string(tiempoConPoda.count()).size()) && i >= 0; i++) cout << " ";
+        cout << "|  " << tiempoSinPoda.count() << "  |" << endl;
+
+        if (truncado) {
+            cout << "   AVISO: se alcanzo el limite de " << maxNodos
+                 << " nodos, resultados PARCIALES para esta variante." << endl;
+        } else if (correcto) {
+            cout << "   Soluciones: con poda=" << solucionesConPoda
+                 << ", sin poda=" << solucionesSinPoda.size() << " -> OK" << endl;
         } else {
-            cout << "Verificacion de correctitud: FALLO (numeros distintos)" << endl;
+            cout << "   Soluciones: con poda=" << solucionesConPoda
+                 << ", sin poda=" << solucionesSinPoda.size()
+                 << " -> FALLO EN CORRECTITUD" << endl;
         }
 
         archivoSalida << nombre << "," << p.n << ","
                       << nodosConPoda << "," << nodosSinPoda << ","
                       << solucionesConPoda << "," << solucionesSinPoda.size() << ","
-                      << tiempoConPoda.count() << "," << tiempoSinPoda.count() << endl;
+                      << tiempoConPoda.count() << "," << tiempoSinPoda.count() << ","
+                      << (truncado ? "SI" : "NO") << endl;
     }
+
+    cout << "----------------------------------------------------------------------------------------------------------------------" << endl;
 
     archivoSalida.close();
     cout << "\nResultados guardados en results/bt_resultados.csv" << endl;
@@ -163,6 +190,7 @@ void pruebasVariantes() {
 int main() {
 
     while (true) {
+
         int opcion;
 
         cout << "" << endl;
@@ -176,7 +204,21 @@ int main() {
         if (opcion == 1) {
             casosPrueba();
         } else if (opcion == 2) {
-            pruebasVariantes();
+            char respuesta;
+            cout << "\n¿Desea usar un limite de nodos para instancias intratables? (s/n): ";
+            cin >> respuesta;
+
+            if (respuesta == 's' || respuesta == 'S') {
+                long long limite;
+                cout << "Ingrese el limite de nodos (ej. 20000000 para 20 millones): ";
+                cin >> limite;
+                pruebasVariantes(true, limite);
+            } else {
+                cout << "Corriendo SIN limite. Algunas variantes pueden tardar mucho "
+                     << "o no terminar; use Ctrl+C para cancelar si es necesario." << endl;
+                pruebasVariantes(false, 0);
+            }
+
             cout << "" << endl;
         } else if (opcion == 3) {
             cout << "Saliendo del programa..." << endl;
