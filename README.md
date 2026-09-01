@@ -82,7 +82,8 @@ La bandera `-O2` es relevante: sin ella los tiempos medidos aumentan de forma co
 ---
  
 ## Ejecución
- 
+
+Si ya has compilado los archivos por primera vez despues solo tienes que utilizar los siguientes comandos ubicado en la carpeta donde estan estos:  
 Ambos programas son interactivos y se manejan mediante un menú por consola. No reciben argumentos por línea de comandos.
  
 ### Módulo FB
