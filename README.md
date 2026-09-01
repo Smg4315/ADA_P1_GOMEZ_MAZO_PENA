@@ -64,7 +64,7 @@ Los dos módulos son **independientes en su implementación**: no comparten cód
  
 ## Compilación
  
-Cada módulo se compila por separado, ya que ambos definen su propio `main()`. Desde la raíz del repositorio:
+Cada módulo se compila por separado, ya que ambos definen su propio `main()`. Desde la raíz del repositorio. Si lo utilizas desde visual studio code lo puedes compilar desde el boton de "Debug" arriba a la derecha:
  
 ```bash
 # Módulo FB — Fuerza Bruta
