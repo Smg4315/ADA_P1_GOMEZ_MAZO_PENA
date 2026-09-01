@@ -1,0 +1,13 @@
+<------ Resultados de las pruebas de tamaños de entrada ------>
+ 
+------------------------------------------------------------------------------------------------
+|  Alfabeto   |   Longitud  |   Tiempo de ejecución (µs) | candidato evaluado | resultado |
+------------------------------------------------------------------------------------------------
+|  abcdefghijklmnopqrstuvwxyz   |   3  |   112058 | mmm | Encontrado  |   
+|  abcdefghijklmnopqrstuvwxyz   |   4  |   2.65051e+06 | mmmm | Encontrado  |   
+|  abcdefghijklmnopqrstuvwxyz   |   5  |   7.08818e+07 | mmmmm | Encontrado  |   
+|  abcdefghijklmnopqrstuvwxyz   |   6  |   1.82274e+09 | mmmmmm | Encontrado  |   
+------------------------------------------------------------------------------------------------
+|  abcdefghijklmnopqrstuvwxyz123456789   |   3  |   179349 | mmm | Encontrado  |   
+|  abcdefghijklmnopqrstuvwxyz123456789   |   4  |   6.27494e+06 | mmmm | Encontrado  |   
+|  abcdefghijklmnopqrstuvwxyz123456789   |   5  |   2.25762e+08 | mmmmm | Encontrado  |

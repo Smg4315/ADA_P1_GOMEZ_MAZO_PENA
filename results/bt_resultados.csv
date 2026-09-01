@@ -1,1 +1,6 @@
-variante,n,nodos_con_poda,nodos_sin_poda,soluciones_con_poda,soluciones_sin_poda,tiempo_con_poda_s,tiempo_sin_poda_s
+variante,n,nodos_con_poda,nodos_sin_poda,soluciones_con_poda,soluciones_sin_poda,tiempo_con_poda_s,tiempo_sin_poda_s,truncado
+(i) Politica completa del equipo, n=8,8,20000000,20000000,2563655,0,0.713586,1.65853,SI
+(ii) Misma politica, n=6,6,1,20000000,0,0,6e-07,1.6286,SI
+(iii) Misma politica, n=10,10,20000000,20000000,2563655,0,0.681604,1.62797,SI
+(iv) Politica relajada (solo minLower=1), n=8,8,20000000,20000000,19696964,19696964,0.664684,6.71278,SI
+(v) Sin restricciones, n=6 (poda nula),6,20000000,20000000,19701489,19701489,0.633304,6.5049,SI
