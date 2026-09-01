@@ -18,6 +18,9 @@ para cada caracter en alfabeto:
 */
 
 #include "third_party/picosha2.cpp"
+#include "fb_main.hpp"
+#include "../tests/tests.cpp"
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -67,19 +70,6 @@ string generarContrasena(string contrasena, int tamanoContrasena, string alfabet
     return "";
 }
 
-// Función para generar la semilla de creación de contraseñas
-int generarSemilla(){
-    string apellidos = "gomezmazopena"; // Apellidos de los estudiantes en orden alfabético
-    int sum = 0; // Variable para almacenar la semilla generada
-
-    for (char caracter : apellidos) {
-        sum += int(caracter); // Se utiliza el valor ASCII de cada caracter para generar la semilla
-    }
-
-    int modulo = 100000;
-    int semilla = sum % modulo; // Se utiliza el módulo para limitar el rango de la semilla generada
-    return semilla; // Retornamos la semilla generada
-}
 
 // Función para generar las contraseñas a partir de la semilla generada para los casos de prueba
 vector<string> generarContrasenasObjetivo(int semilla) {
@@ -114,127 +104,6 @@ vector<string> generarContrasenasObjetivo(int semilla) {
     return contrasenas;
 }
 
-// Función para hacer los casos de prueba especificados en la seccion 9.1
-void casosPrueba() {
-
-// Creación de contraseñas a encontrar con semilla (1405)
-    int semilla = generarSemilla(); // Generación de la semilla para la creación de contraseñas
-    cout << "Semilla generada: " << semilla << endl; // Print de la semilla generada
-
-    // Generación de las contraseñas a encontrar con la semilla de equipo
-    vector<string> contrasenasObjetivo = generarContrasenasObjetivo(semilla); 
-    
-    // creacion de los hashes de las contraseñas.
-    for (const string& contrasenaObjetivo : contrasenasObjetivo) {
-        string hash = generarHash(contrasenaObjetivo); // Generación del hash de la contraseña objetivo
-        hashesObjetivo.push_back(hash); // Almacenamiento del hash generado en el vector de hashes
-        cout << "Contrasena objetivo generada: " << contrasenaObjetivo << ", Hash -> " << hash << endl; 
-    }
-
-    // Encontremos la contraseña objetivo a partir de su hash
-
-    for (int i = 0; i < hashesObjetivo.size(); i++) {
-
-        cout << "Buscando contrasena para el hash: "
-            << hashesObjetivo[i] << endl;
-        
-        // Se implementa de esta manera para tener contról de la longitud y el alfabeto a utilizar en cada iteración
-        // Ahorrando recursos computacionales al no comparar cadenas de diferente longitud y alfabeto cuando no es necesario    
-        string resultado = generarContrasena( "", longitudes[i], alfabetos[i], hashesObjetivo[i]);
-
-        if (encontrado) {
-            cout << "La contrasena encontrada es: "
-                << resultado << endl;
-
-            encontrado = false; // Reiniciamos la variable encontrado para la siguiente búsqueda
-        } 
-        else {
-            cout << "No se encontró la contrasena para el hash: "
-                << hashesObjetivo[i] << endl;
-        }
-    }
-
-    return;
-}
-
-void pruebasTamanosEntrada() {
-
-    // Implementación de pruebas de tamaños de entrada para métricas de tiempo y espacio
-
-    vector<int> longitudesPruebaA1 = {3, 4, 5, 6}; // Longitudes de prueba para el alfabeto 1
-    vector<int> longitudesPruebaA2 = {3, 4, 5}; // Longitudes de prueba para el alfabeto 2
-
-    // Definimos un arreglo de contraseñas ya establecidas para hacer un ánalisis uniforme 
-    // de los tiempos de ejecución y el espacio utilizado para cada tamaño de entrada. Evitando comparar un 
-    // posible mejor caso con uno peor. 
-    // Se usa la m pues está alrededor de la mitad del alfabeto
-    vector<string> contrasenasObjetivo = {"mmm", "mmmm", "mmmmm", "mmmmmm"};
-
-    ofstream archivoSalida("../results/resultados_FB.csv"); // Archivo para almacenar los resultados de las pruebas
-
-    if (!archivoSalida.is_open()) {
-        cerr << "No se pudo crear el archivo de métricas." << endl;
-        return;
-    }
-
-    archivoSalida << "<------ Resultados de las pruebas de tamaños de entrada ------>" << endl;
-    archivoSalida << " " << endl;
-
-    archivoSalida << "------------------------------------------------------------------------------------------------" << endl;
-    archivoSalida << "|  Alfabeto   |   Longitud  |   Tiempo de ejecución (µs) | candidato evaluado | resultado |" << endl;
-    archivoSalida << "------------------------------------------------------------------------------------------------" << endl;
-
-
-    for(int i = 0; i < longitudesPruebaA1.size(); i++) {
-        
-        encontrado = false; // Reiniciamos la variable encontrado para la siguiente búsqueda
-        
-        string hash = generarHash(contrasenasObjetivo[i]); // Generación del hash de la contraseña objetivo
-
-        auto inicio = chrono::high_resolution_clock::now(); // Inicio de la medición de tiempo
-        string candidato = generarContrasena("", longitudesPruebaA1[i], alfabetoA1, hash); // Búsqueda de la contraseña a partir del hash
-        auto fin = chrono::high_resolution_clock::now(); // Fin de la medición de tiempo
-
-        chrono::duration<double, micro> elapsed = fin - inicio; // Cálculo del tiempo transcurrido
-
-        string resultado = "";
-        if(candidato == "") {
-            resultado = "No encontrado";
-        } else {
-            resultado = "Encontrado";
-        }
-
-        archivoSalida << "|  " << alfabetoA1 << "   |   " << longitudesPruebaA1[i] << "  |   " 
-                      << elapsed.count() << " | " << contrasenasObjetivo[i] << " | " << resultado  << "  |   " << endl;
-    }
-
-    archivoSalida << "------------------------------------------------------------------------------------------------" << endl;
-
-    for(int i = 0; i < longitudesPruebaA2.size(); i++) {
-
-        encontrado = false; // Reiniciamos la variable encontrado para la siguiente búsqueda
-
-        string hash = generarHash(contrasenasObjetivo[i]); // Generación del hash de la contraseña objetivo
-
-        auto inicio = chrono::high_resolution_clock::now(); // Inicio de la medición de tiempo
-        string candidato = generarContrasena("", longitudesPruebaA2[i], alfabetoA2, hash); // Búsqueda de la contraseña a partir del hash
-        auto fin = chrono::high_resolution_clock::now(); // Fin de la medición de tiempo
-
-        chrono::duration<double, micro> elapsed = fin - inicio; // Cálculo del tiempo transcurrido
-
-        string resultado = "";
-        if(candidato == "") {
-            resultado = "No encontrado";
-        } else {
-            resultado = "Encontrado";
-        }
-
-        archivoSalida << "|  " << alfabetoA2 << "   |   " << longitudesPruebaA2[i] << "  |   " 
-                      << elapsed.count() << " | " << contrasenasObjetivo[i] << " | " << resultado  << "  |   " << endl;
-    }
-
-    return;
-}
 
 int main() {
 
