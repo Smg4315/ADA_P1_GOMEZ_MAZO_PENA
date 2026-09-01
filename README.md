@@ -73,10 +73,6 @@ g++ -std=c++17 -O2 -o fb_main src/fb_main.cpp
 # Módulo BT — Backtracking
 g++ -std=c++17 -O2 -o bt_main src/bt_main.cpp
  
-# Utilidad de verificación de semilla (opcional)
-g++ -std=c++17 -O2 -o verificar_semilla resources/verificar_semilla.cpp
-```
- 
 La bandera `-O2` es relevante: sin ella los tiempos medidos aumentan de forma considerable y no son comparables con los reportados en el informe.
  
 ---
