@@ -68,4 +68,67 @@ std::vector<std::string> resolverSinPoda(const Policy& p, const std::string& alf
     return soluciones;
 }
 
+// Igual a backtrackSinPoda, pero solo cuenta soluciones (no las almacena).
+// Necesario para variantes sin restricciones, donde guardar cada solucion
+// en un vector agota la memoria (ej. 69^6 soluciones).
+void backtrackContarSinPoda(std::string& prefijo,
+                             int countLower, int countUpper, int countDigit, int countSymbol,
+                             char ultimoCaracter,
+                             const Policy& p,
+                             const std::string& alfabeto,
+                             long long& totalSoluciones,
+                             long long& nodosGenerados,
+                             long long maxNodos = std::numeric_limits<long long>::max()) {
+
+    if (nodosGenerados >= maxNodos) {
+        return;
+    }
+
+    nodosGenerados++;
+
+    if ((int)prefijo.size() == p.n) {
+        if (countLower >= p.minLower && countUpper >= p.minUpper &&
+            countDigit >= p.minDigit && countSymbol >= p.minSymbol) {
+            totalSoluciones++;
+        }
+        return;
+    }
+
+    for (char c : alfabeto) {
+        if (p.noRepetidosConsecutivos && c == ultimoCaracter) {
+            continue;
+        }
+
+        if (nodosGenerados >= maxNodos) {
+            return;
+        }
+
+        int nuevoLower = countLower;
+        int nuevoUpper = countUpper;
+        int nuevoDigit = countDigit;
+        int nuevoSymbol = countSymbol;
+
+        char tipo = tipoDeCaracter(c);
+        if (tipo == 'L') nuevoLower++;
+        else if (tipo == 'U') nuevoUpper++;
+        else if (tipo == 'D') nuevoDigit++;
+        else nuevoSymbol++;
+
+        prefijo.push_back(c);
+        backtrackContarSinPoda(prefijo, nuevoLower, nuevoUpper, nuevoDigit, nuevoSymbol,
+                                c, p, alfabeto, totalSoluciones, nodosGenerados, maxNodos);
+        prefijo.pop_back();
+    }
+}
+
+long long contarSolucionesSinPoda(const Policy& p, const std::string& alfabeto,
+                                   long long& nodosGenerados,
+                                   long long maxNodos = std::numeric_limits<long long>::max()) {
+    std::string prefijo = "";
+    long long totalSoluciones = 0;
+    nodosGenerados = 0;
+    backtrackContarSinPoda(prefijo, 0, 0, 0, 0, '\0', p, alfabeto, totalSoluciones, nodosGenerados, maxNodos);
+    return totalSoluciones;
+}
+
 #endif // BT_SINPODA_HPP

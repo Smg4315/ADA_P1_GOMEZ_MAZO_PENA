@@ -111,7 +111,7 @@ void pruebasVariantes(bool usarLimite, long long maxNodos) {
     v5.noRepetidosConsecutivos = false;
     variantes.push_back({"(v) Sin restricciones, n=6 (poda nula)", v5});
 
-    ofstream archivoSalida("results/bt_resultados.csv");
+    ofstream archivoSalida("../results/bt_resultados.csv");
 
     if (!archivoSalida.is_open()) {
         cerr << "No se pudo crear el archivo de metricas." << endl;
