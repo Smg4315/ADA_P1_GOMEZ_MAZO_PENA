@@ -1,0 +1,11 @@
+<------ Resultados de las pruebas con las contrasenas de la semilla ------>
+ 
+------------------------------------------------------------------------------------------------------------------------------------------
+|  Alfabeto   |   Longitud  |  Contrasena objetivo  |   Tiempo fuerza bruta (µs)  | resultado fuerza bruta | Tiempo diccionario (µs) | resultado diccionario |
+------------------------------------------------------------------------------------------------------------------------------------------
+|  abcdefghijklmnopqrstuvwxyz   |   4  |   ilkv  |   1.78051e+06 | Encontrado | 6335.67 | No encontrado  |
+|  abcdefghijklmnopqrstuvwxyz123456789   |   4  |   kurq  |   5.30647e+06 | Encontrado | 6083.17 | No encontrado  |
+|  abcdefghijklmnopqrstuvwxyz   |   5  |   azilo  |   5.29121e+06 | Encontrado | 6084.88 | No encontrado  |
+|  abcdefghijklmnopqrstuvwxyz123456789   |   5  |   52tb4  |   1.34053e+09 | Encontrado | 7103.88 | No encontrado  |
+|  abcdefghijklmnopqrstuvwxyz   |   6  |   odcxgd  |   2.86041e+09 | Encontrado | 10530.1 | No encontrado  |
+------------------------------------------------------------------------------------------------------------------------------------------

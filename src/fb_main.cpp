@@ -113,7 +113,7 @@ int main() {
 
         cout << "" << endl;
         cout << "Ingrese la opcion que le gustaria hacer" << endl;
-        cout << "1. Revisar casos de prueba" << endl;
+        cout << "1. Revisar casos de prueba (semilla) + comparación por diccionario" << endl;
         cout << "2. Hacer pruebas de tamaños de entrada para metricas" << endl;
         cout << "3. salir" << endl;
 
